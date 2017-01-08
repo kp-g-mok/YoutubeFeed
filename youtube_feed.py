@@ -3,6 +3,7 @@ import youtube_api as ya
 import datetime as dt
 
 from xml.etree import ElementTree
+from googleapiclient.errors import HttpError
 from urllib.parse import urlparse
 
 
@@ -62,16 +63,20 @@ def process_feed_from(api_key, date, channels):
 
 def add_to_playlist(client_secret_file, playlist_id, video_id):
     youtube_service = ya.YoutubeClientAPI(client_secret_file).get_authenticated_service()
-    add_video_request = youtube_service.playlistItems().insert(
-        part="snippet",
-        body={
-            'snippet': {
-                'playlistId': playlist_id,
-                'resourceId': {
-                    'kind': 'youtube#video',
-                    'videoId': video_id
+    try:
+        add_video_request = youtube_service.playlistItems().insert(
+            part="snippet",
+            body={
+                'snippet': {
+                    'playlistId': playlist_id,
+                    'resourceId': {
+                        'kind': 'youtube#video',
+                        'videoId': video_id
+                    }
+                    # 'position': 0
                 }
-                # 'position': 0
             }
-        }
-    ).execute()
+        ).execute()
+    except HttpError:
+        pass
+
