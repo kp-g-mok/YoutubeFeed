@@ -96,10 +96,11 @@ class MainWindow(QtGui.QMainWindow, form_main):
         self.pb_adding_videos.setMaximum(video_count)
 
         count = 0
+        client_secrets_file = find_data_file(self.settings.get_client_secrets_file())
         for publish_date in sorted(self.videos):
             for channel_name in sorted(self.videos[publish_date]):
                 for video_title in sorted(self.videos[publish_date][channel_name]):
-                    yf.add_to_playlist(self.settings.get_client_secrets_file(),
+                    yf.add_to_playlist(client_secrets_file,
                                        'WL',
                                        self.videos[publish_date][channel_name][video_title])
                     count += 1

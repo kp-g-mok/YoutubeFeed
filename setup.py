@@ -1,4 +1,5 @@
 import sys
+import requests.certs
 from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need
@@ -20,7 +21,8 @@ buildOptions = {'packages': [],
                                   'client_secret.json',
                                   'main.ui',
                                   'settings.json',
-                                  'subscription_manager.xml']
+                                  'subscription_manager.xml',
+                                  (requests.certs.where(), 'cacert.pem')]
                 }
 
 base = 'Win32GUI' if sys.platform == 'win32' else None

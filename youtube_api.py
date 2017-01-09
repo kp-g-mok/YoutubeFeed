@@ -1,4 +1,5 @@
 import urllib.request
+import requests
 import json
 from datetime import datetime, timedelta
 
@@ -70,20 +71,45 @@ class YoutubeClientAPI:
         self.YOUTUBE_API_SERVICE_NAME = "youtube"
         self.YOUTUBE_API_VERSION = "v3"
 
+        if getattr(sys, 'frozen', False):
+            # The application is frozen
+            self.data_dir = os.path.dirname(sys.executable)
+        else:
+            # The application is not frozen
+            # Change this bit to match where you store your data files:
+            self.data_dir = os.path.dirname(__file__)
+
         self.flow = flow_from_clientsecrets(self.CLIENT_SECRETS_FILE,
                                             scope=self.YOUTUBE_SCOPE,
                                             message=self.MISSING_CLIENT_SECRETS_MESSAGE)
 
-        self.storage = Storage("%s-oauth2.json" % sys.argv[0])
-        self.credentials = self.storage.get()
+        self.storage = Storage(os.path.join(self.data_dir, "{}-oauth2.json".format(sys.argv[0])))
+        self.credentials = None
+        try:
+            self.credentials = self.storage.get()
+        except AttributeError:
+            pass
 
         if self.credentials is None or self.credentials.invalid:
-            self.credentials = run_flow(self.flow, self.storage)
+            self.credentials = run_flow(self.flow, self.storage,
+                                        http=httplib2.Http(ca_certs=os.path.join(self.data_dir, 'cacert.pem')))
 
     def get_authenticated_service(self):
-        return build(self.YOUTUBE_API_SERVICE_NAME,
-                     self.YOUTUBE_API_VERSION,
-                     http=self.credentials.authorize(httplib2.Http()))
+        if getattr(sys, 'frozen', False):
+            # The application is frozen
+            self.data_dir = os.path.dirname(sys.executable)
+            return build(self.YOUTUBE_API_SERVICE_NAME,
+                         self.YOUTUBE_API_VERSION,
+                         http=self.credentials.authorize(
+                             httplib2.Http(ca_certs=os.path.join(self.data_dir, 'cacert.pem'))))
+
+        else:
+            # The application is not frozen
+            # Change this bit to match where you store your data files:
+            return build(self.YOUTUBE_API_SERVICE_NAME,
+                         self.YOUTUBE_API_VERSION,
+                         http=self.credentials.authorize(
+                             httplib2.Http()))
 
 
 class Channel:
