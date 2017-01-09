@@ -8,10 +8,10 @@ You have to obtain your own Youtube API key to get videos and you will need to g
 2. Setup the utility as shown below  
 3. Run gui_main.py  
 
-~~##Using the windows compiled executable~~ (Compiled version can't add videos to Watch Later)  
-1. ~~Download the release~~  
-2. ~~Setup the utility as shown below~~  
-3. ~~Run YoutubeFeed.exe~~  
+##Using the windows compiled executable  
+1. Download the release  
+2. Setup the utility as shown below  
+3. Run YoutubeFeed.exe  
 
 
 ##Setup the utility
