@@ -18,10 +18,12 @@ class MainWindow(QtGui.QMainWindow, form_main):
         self.setupUi(self)
 
         self.settings = Settings(find_data_file('settings.json'))
-        self.videos = {}
 
         self.trv_Video_Feed_Model = QtGui.QStandardItemModel(self.trv_Video_Feed_View)
         self.reset_treeview_model()
+
+        self.YoutubeFeed = yf.YoutubeFeed()
+        self.YoutubeFeed.progress_update.connect(self.handle_progress_update)
 
         self.refresh_date()
         self.setup_treeview()
@@ -62,17 +64,23 @@ class MainWindow(QtGui.QMainWindow, form_main):
             error_message("No Last Checked Date.\nCheck settings.json file.")
 
         self.reset_treeview_model()
-        self.videos = yf.process_feed_from(api_key, last_checked_date, yf.process_file(find_data_file('subscription_manager.xml')))
+        self.YoutubeFeed.process_file(find_data_file('subscription_manager.xml'))
 
-        for publish_date in sorted(self.videos):
+        self.pb_work_progress.setValue(0)  # Reset value
+        self.pb_work_progress.setMaximum(len(self.YoutubeFeed.get_channels()))
+        self.YoutubeFeed.process_feed_from(api_key, last_checked_date)
+        videos = self.YoutubeFeed.get_videos()
+
+        for publish_date in sorted(videos):
             date = QtGui.QStandardItem(dt.datetime.strptime(publish_date, '%Y-%m-%d').strftime('%m/%d/%y'))
-            for channel_name in sorted(self.videos[publish_date]):
+            for channel_name in sorted(videos[publish_date]):
                 channel = QtGui.QStandardItem(channel_name)
-                for video_title in sorted(self.videos[publish_date][channel_name]):
+                for time in sorted(videos[publish_date][channel_name]):
+                    video_title = videos[publish_date][channel_name][time]['Video Title']
                     video = QtGui.QStandardItem(video_title)
                     video_url = QtGui.QStandardItem(
                         "https://www.youtube.com/watch?v={}".format(
-                            self.videos[publish_date][channel_name][video_title]))
+                            videos[publish_date][channel_name][time]['Video ID']))
                     channel.appendRow([video, video_url])
                 date.appendRow(channel)
             self.trv_Video_Feed_Model.appendRow(date)
@@ -87,26 +95,28 @@ class MainWindow(QtGui.QMainWindow, form_main):
         self.refresh_date()
 
     def act_watch_later_triggered(self):
-        self.pb_adding_videos.setValue(0)  # Reset value
+        self.pb_work_progress.setValue(0)  # Reset value
 
+        videos = self.YoutubeFeed.get_videos()
         video_count = 0
-        for publish_date in self.videos:
-            for channel_name in self.videos[publish_date]:
-                video_count += len(self.videos[publish_date][channel_name])
-        self.pb_adding_videos.setMaximum(video_count)
+        for publish_date in videos:
+            for channel_name in videos[publish_date]:
+                video_count += len(videos[publish_date][channel_name])
+        self.pb_work_progress.setMaximum(video_count)
 
         count = 0
         client_secrets_file = find_data_file(self.settings.get_client_secrets_file())
-        for publish_date in sorted(self.videos):
-            for channel_name in sorted(self.videos[publish_date]):
-                for video_title in sorted(self.videos[publish_date][channel_name]):
-                    yf.add_to_playlist(client_secrets_file,
-                                       'WL',
-                                       self.videos[publish_date][channel_name][video_title])
-                    count += 1
-                    self.pb_adding_videos.setValue(count)
+        for publish_date in sorted(videos):
+            for channel_name in sorted(videos[publish_date]):
+                for time in sorted(videos[publish_date][channel_name]):
+                    video_url = videos[publish_date][channel_name][time]['Video ID']
+                    count = self.YoutubeFeed.add_to_playlist(client_secrets_file, 'WL', video_url, count)
 
         self.act_update_date_triggered()
+
+    def handle_progress_update(self, value):
+        self.pb_work_progress.setValue(value)
+        QtGui.qApp.processEvents()
 
 
 def error_message(err_msg):

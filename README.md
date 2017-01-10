@@ -21,6 +21,7 @@ You have to obtain your own Youtube API key to get videos and you will need to g
 4. Follow the "Get RSS updates for all subscriptions" on the [Use RSS with YouTube](https://support.google.com/youtube/answer/6224202?hl=en) page to download the "subscription_manager.xml" file to your YoutubeFeed folder
 
 # Shortcuts and Actions
-1. Check Channel Feed [Ctrl + 1] - Recheck the channels specified in the "subscription_manager.xml" file for new videos published since the Last Checked Date  
+1. Check Channel Feed [Ctrl + 1] - Recheck the channels specified in the "subscription_manager.xml" file for new videos published since the Last Checked Date. Progress is shown in the progress bar by the number of channels processed by the utility.
+   * There can be a delay of a couple of hours from when a channel uploads items to when the feed can see them
 2. Update Date [Ctrl + 2] - Update the Last Checked Date to the current date  
-3. Add to Watch Later [Ctrl + 3] - Add the videos shown in the utility to your Watch Later playlist. Progress is shown in the progress bar next to the button. After it's finished, the Last Checked date is updated to the current date.  
+3. Add to Watch Later [Ctrl + 3] - Add the videos shown in the utility to your Watch Later playlist. Progress is shown in the progress bar by the number of videos processed by the utility. After it's finished, the Last Checked date is updated to the current date.  

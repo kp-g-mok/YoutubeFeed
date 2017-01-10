@@ -73,7 +73,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QProgressBar" name="pb_adding_videos">
+          <widget class="QProgressBar" name="pb_work_progress">
            <property name="maximumSize">
             <size>
              <width>200</width>
