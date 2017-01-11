@@ -46,7 +46,7 @@ class YoutubeFeed(QtCore.QObject):
         """
         Gets all the videos from the channels given
         :param api_key: String with the Youtube API key
-        :param date: datetime object with the starting date in the past
+        :param date: string date in format '%Y-%m-%d'
         :param channels: Dictionary in format - { channel name : channel id }
         :return: dictionary of format
             {
@@ -72,18 +72,20 @@ class YoutubeFeed(QtCore.QObject):
                 vid = ya.Video(api_key, videoId)
                 data = vid.get_data()
 
-                date = str(data['date'].date())
-                time = str(data['date'].time())
-                if date not in self.videos:
-                    self.videos[date] = {channel_name: {time: {'Video Title': data["title"], 'Video ID': data["video id"]}}}
+                publish_date = str(data['date'].date())
+                publish_time = str(data['date'].time())
+                if publish_date not in self.videos:
+                    self.videos[publish_date] = {channel_name: {publish_time:
+                                                                {'Video Title': data["title"],
+                                                                 'Video ID': data["video id"]}}}
                 else:
-                    if channel_name not in self.videos[date]:
-                        self.videos[date][channel_name] = {time:
+                    if channel_name not in self.videos[publish_date]:
+                        self.videos[publish_date][channel_name] = {publish_time:
                                                           {'Video Title': data["title"], 'Video ID': data["video id"]}}
                     else:
-                        self.videos[date][channel_name][time] = {}
-                        self.videos[date][channel_name][time]['Video Title'] = data["title"]
-                        self.videos[date][channel_name][time]['Video ID'] = data["video id"]
+                        self.videos[publish_date][channel_name][publish_time] = {}
+                        self.videos[publish_date][channel_name][publish_time]['Video Title'] = data["title"]
+                        self.videos[publish_date][channel_name][publish_time]['Video ID'] = data["video id"]
 
             count += 1
             self.progress_update.emit(count)

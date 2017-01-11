@@ -32,8 +32,8 @@ class MainWindow(QtGui.QMainWindow, form_main):
     def reset_treeview_model(self):
         self.trv_Video_Feed_Model.clear()
         self.trv_Video_Feed_Model.setHorizontalHeaderLabels(['', ''])
-        self.trv_Video_Feed_View.setColumnWidth(0, 700)
-        self.trv_Video_Feed_View.setColumnWidth(1, 300)
+        self.trv_Video_Feed_View.setColumnWidth(0, 600)
+        self.trv_Video_Feed_View.setColumnWidth(1, 400)
 
     def setup_treeview(self):
         self.trv_Video_Feed_View.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)

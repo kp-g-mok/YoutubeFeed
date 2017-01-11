@@ -91,8 +91,12 @@ class YoutubeClientAPI:
             pass
 
         if self.credentials is None or self.credentials.invalid:
-            self.credentials = run_flow(self.flow, self.storage,
-                                        http=httplib2.Http(ca_certs=os.path.join(self.data_dir, 'cacert.pem')))
+            if getattr(sys, 'frozen', False):
+                # The application is frozen
+                self.credentials = run_flow(self.flow, self.storage,
+                                            http=httplib2.Http(ca_certs=os.path.join(self.data_dir, 'cacert.pem')))
+            else:
+                self.credentials = run_flow(self.flow, self.storage)
 
     def get_authenticated_service(self):
         if getattr(sys, 'frozen', False):
