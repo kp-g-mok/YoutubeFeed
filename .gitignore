@@ -7,3 +7,4 @@ build/
 *.json
 *.xml
 test.py
+settings.json
